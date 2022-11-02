@@ -1,0 +1,35 @@
+﻿<#+
+    /// <summary>
+    /// 实体属性
+    /// </summary>
+    public class MySQLDbField
+    {   
+        /// <summary>
+        /// 构造方法
+        /// </summary>
+        /// <param name="name">名称</param>
+        /// <param name="type">数据类型</param>
+        /// <param name="comment">描述</param>
+        public MySQLDbField(string name, string type, string comment)
+        {
+            Name = name;
+            Type = type;
+            Comment = comment;
+        }        
+        
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
+        
+        /// <summary>
+        /// 数据类型
+        /// </summary>
+        public string Type { get; set; }
+        
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Comment { get; set; }
+    }
+#>

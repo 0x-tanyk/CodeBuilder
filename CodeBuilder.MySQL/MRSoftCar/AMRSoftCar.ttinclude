@@ -1,0 +1,27 @@
+﻿<#+
+	/// <summary>
+    /// 模板描述信息
+    /// </summary>
+    public static class AMRSoftCar
+    {   
+        /// <summary>
+        /// 顶级命名空间
+        /// </summary>
+        public static string FILE_NAMESPACE = "MRSoftCar";
+
+        /// <summary>
+        /// 领域名称
+        /// </summary>
+        public static string FILE_DOMAINNAME = "Shop";
+
+        /// <summary>
+        /// 数据库
+        /// </summary>
+        public static string DB_NAME = "mrstarburst";
+
+        /// <summary>
+        /// 输出路径
+        /// </summary>
+        public static string OUTPUT_PATH = @"OutPut\MRSoftCar";
+    }
+#>

@@ -1,0 +1,106 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+
+<#@ include file="$(ProjectDir)\Config\DbConnection.ttinclude" #>
+<#@ include file="$(ProjectDir)\Config\TemplateComment.ttinclude" #>
+<#@ include file="$(ProjectDir)\Entity\MySQLDbField.ttinclude" #>
+<#@ include file="$(ProjectDir)\Entity\MySQLDbTable.ttinclude" #>
+<#@ include file="$(ProjectDir)\Helper\MySQLDbHelper.ttinclude" #>
+<#@ include file="$(ProjectDir)\Helper\MySQLCLRTypeHelper.ttinclude" #>
+<#@ include file="$(ProjectDir)\Helper\StringHelper.ttinclude" #>
+<#@ include file="AMigration.ttinclude" #>
+
+//-----------------------------------------------------------------------
+// <copyright file="ShopMigrationService" company="<#=TemplateComment.FILE_COPYRIGHT#>">
+// * Copyright (C) <#=TemplateComment.FILE_COPYRIGHT_YEAR#> <#=TemplateComment.FILE_COPYRIGHT#> All Rights Reserved
+// * Version : <#=TemplateComment.SDK_VERSION#>
+// * Author  : <#=TemplateComment.FILE_AUTHOR#>
+// * FileName: ShopMigrationService.cs
+// * DateTime: <#=TemplateComment.FILE_TIME#>
+// </copyright>
+//-----------------------------------------------------------------------
+using MRSoft.Base.Enums;
+using MRSoft.Base.Extensions;
+using MRSoft.Base.Service;
+using MRSoft.Base.Utils;
+using MRSoft.Data;
+using MRSoft.DataTransfer.Dto;
+using MRSoft.DataTransfer.Dto.OldDataBase;
+using MRSoft.DataTransfer.Dto.Output;
+using MRSoft.DataTransfer.Entity;
+using MRSoft.DataTransfer.IService;
+using MRSoft.DataTransfer.Service.Dao;
+using MRSoft.IdGenerate;
+using MRSoft.OtherApi.Helper;
+using MRSoft.OtherApi.MRSoftAPI;
+
+using MRSOFT;
+using MRSOFT.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace <#=AMigration.FILE_NAMESPACE#>.Entity<#=String.IsNullOrEmpty(AMigration.FILE_DOMAINNAME) ? "" : $".{AMigration.FILE_DOMAINNAME}" #>
+{
+    public class ShopMigrationService : IShopMigrationService
+    {    
+<#   
+    var entities = MySQLDbHelper.GetEntities(DbConnection.CONNECTION_STRING, AMigration.DB_NAME);
+    foreach(MySQLDbTable entity in entities)
+    {
+		var name = StringHelper.ToBigHump(entity.Name);
+        var comment = entity.Comment;
+#>
+        /// <summary>
+        /// 处理<#=comment#>
+        /// </summary>
+        /// <param name="items"><#=comment#>集合</param>
+        /// <param name="shopId">店铺id</param>
+        /// <returns></returns>
+        public async Task Handle<#=name#>Async(IEnumerable<Old_BaseDto> items, long shopId)
+        {            
+            foreach (var item in items)
+            {
+                var dto = item as Old_PaymentTermDto;
+                var entity = new <#=name#>()
+                {
+<#
+        foreach(MySQLDbField field in entity.Fields)
+        {
+            var fieldName = StringHelper.ToBigHump(field.Name);
+            var fieldType = field.Type;
+            var fieldComment = field.Comment;
+#>
+                    <#=fieldName#> = dto.<#=fieldName#>,                
+<#
+        }   
+#>
+                };
+                await DapperFactory.Instance.InsertAsync("New_Wordbook_Insert", entity, DataSourceName.NewDataBase);
+            }
+        }
+
+<#
+    }
+#>
+    }
+}
+<#
+    var path = @$"{Host.ResolveAssemblyReference("$(ProjectDir)")}{AMigration.OUTPUT_PATH}\Service";
+    if(!Directory.Exists(path))
+    {
+        Directory.CreateDirectory(path);
+    }
+    string fileName = string.Format(@"{0}\{1}.cs", path, "ShopMigrationService");
+    File.WriteAllText(fileName , this.GenerationEnvironment.ToString());
+    this.GenerationEnvironment.Clear();
+#>

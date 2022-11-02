@@ -1,0 +1,12 @@
+﻿<#+
+    /// <summary>
+    /// 静态类（数据库链接）
+    /// </summary>
+    public static class DbConnection
+    {       
+        /// <summary>
+        /// 链接字符串
+        /// </summary>
+        public static string CONNECTION_STRING = "server=10.10.2.168;port=30002;uid=root;pwd=Mrkj20140308;charset=utf8;";
+    }
+#>

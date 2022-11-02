@@ -1,0 +1,94 @@
+﻿<#+
+    /// <summary>
+    /// 数据类型帮助类
+    /// </summary>
+    public static class MySQLCLRTypeHelper 
+    {    
+        /// <summary>
+        /// 构造方法
+        /// </summary>
+        /// <param name="dbType">数据库类型</param>
+        /// <param name="isNull">是否为空</param>
+        /// <returns>实体属性数据类型</returns>
+        public static string GetCLRType(string dbType, bool isNull)
+        {
+            var result = "";
+            switch(dbType)
+            {
+                case "tinyint":
+                case "smallint":
+                case "mediumint":
+                case "int":
+                case "integer":
+                    result = "int";
+                    break;
+                case "bigint":
+                    result =  "long";
+                    break;
+                case "double":
+                    result =  "double";
+                    break;
+                case "float":
+                    result =  "float";
+                    break;
+                case "decimal":
+                    result =  "decimal";
+                    break;
+                case "numeric":
+                case "real":
+                    result =  "decimal";
+                    break;
+                case "bit":
+                    result =  "bool";
+                    break;
+                case "date":
+                case "time":
+                case "year":
+                case "datetime":
+                case "timestamp":
+                    result =  "DateTime";
+                    break;
+                case "tinyblob":
+                case "blob":
+                case "mediumblob":
+                case "longblog":
+                case "binary":
+                case "varbinary":
+                    result =  "byte[]";
+                    break;
+                case "char":
+                case "varchar":                   
+                case "tinytext":
+                case "text":
+                case "mediumtext":
+                case "longtext":
+                case "json":
+                    result =  "string";
+                    break;
+                case "point":
+                case "linestring":
+                case "polygon":
+                case "geometry":
+                case "multipoint":
+                case "multilinestring":
+                case "multipolygon":
+                case "geometrycollection":
+                case "enum":
+                case "set":
+                default:
+                    result = dbType;
+                    break;
+            }
+            if(isNull){
+                if(result=="string"){
+                    return result;
+                }
+                if(result=="byte[]"){
+                    return "byte?[]";
+                }
+                result=result+"?";
+            }
+            return result;
+        }
+    }
+#>

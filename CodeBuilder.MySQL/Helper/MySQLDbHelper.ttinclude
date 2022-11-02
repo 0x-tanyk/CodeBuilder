@@ -1,0 +1,78 @@
+﻿<#@ assembly name="System.Core"#>
+<#@ assembly name="System.Data"#>
+<#@ assembly name="MySql.Data"#>
+
+<#@ import namespace="System" #>
+<#@ import namespace="System.Data" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="MySql.Data.MySqlClient" #>
+
+<#+
+    /// <summary>
+    /// MySQL帮助类
+    /// </summary>
+    public static class MySQLDbHelper
+    {
+        /// <summary>
+        /// 获取实体集合
+        /// </summary>
+        /// <param name="connStr">链接字符串</param>
+        /// <param name="database">数据库</param>
+        /// <returns>实体集合</returns>
+        public static List<MySQLDbTable> GetEntities(string connStr, string database)
+        {
+            var list = new List<MySQLDbTable>();
+            var conn = new MySqlConnection(connStr);
+            try
+            {
+                conn.Open();
+                //var dbs = string.Join("','", dbList.ToArray());
+                var cmd = string.Format(@"SELECT A.TABLE_SCHEMA,A.TABLE_NAME,B.TABLE_COMMENT,
+                A.COLUMN_NAME,A.DATA_TYPE,A.IS_NULLABLE,A.COLUMN_COMMENT
+                FROM (
+	                SELECT c.`TABLE_SCHEMA`,c.`TABLE_NAME`,c.`COLUMN_NAME`,
+	                c.`DATA_TYPE`,c.`COLUMN_COMMENT`,c.`IS_NULLABLE` 
+	                FROM `information_schema`.`COLUMNS` c 
+	                WHERE	c.`TABLE_SCHEMA`='{0}' 
+                ) A
+                JOIN (
+	                SELECT t.`TABLE_NAME`,t.`TABLE_COMMENT` 
+	                FROM information_schema.`TABLES` t 
+	                WHERE t.`TABLE_SCHEMA`='{0}' 
+                ) B ON A.TABLE_NAME=B.TABLE_NAME;", database);
+                using (var reader = MySqlHelper.ExecuteReader(conn, cmd))
+                {
+                    while (reader.Read())
+                    {
+                        var db = reader["TABLE_SCHEMA"].ToString();
+                        var table = reader["TABLE_NAME"].ToString();
+                        var column = reader["COLUMN_NAME"].ToString();
+                        var type =  reader["DATA_TYPE"].ToString();
+                        var isNull = reader["IS_NULLABLE"].ToString()=="YES";
+                        var comment = reader["COLUMN_COMMENT"].ToString();
+                        var tableComment= reader["TABLE_COMMENT"].ToString();
+                        var entity = list.FirstOrDefault(x => x.Name == table);
+                        var dbType = MySQLCLRTypeHelper.GetCLRType(type,isNull);
+
+                        if(entity == null)
+                        {
+                            entity = new MySQLDbTable(table, tableComment);
+                            entity.Fields.Add(new MySQLDbField(column, dbType, comment));                           
+                            list.Add(entity);
+                        }
+                        else
+                        {
+                            entity.Fields.Add(new MySQLDbField(column, dbType, comment));
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                conn.Close();
+            }
+            return list;
+        }
+    }
+#>

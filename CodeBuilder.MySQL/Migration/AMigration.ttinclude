@@ -1,0 +1,27 @@
+﻿<#+
+	/// <summary>
+    /// 模板描述信息
+    /// </summary>
+    public static class AMigration
+    {   
+        /// <summary>
+        /// 顶级命名空间
+        /// </summary>
+        public static string FILE_NAMESPACE = "KJJMigration";
+
+        /// <summary>
+        /// 领域名称
+        /// </summary>
+        public static string FILE_DOMAINNAME = "";
+
+        /// <summary>
+        /// 数据库
+        /// </summary>
+        public static string DB_NAME = "marketing_migration";
+
+        /// <summary>
+        /// 输出路径
+        /// </summary>
+        public static string OUTPUT_PATH = @"OutPut\Marketing";
+    }
+#>

@@ -1,0 +1,143 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="8.0.28" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Migration\Dao.sql.xml.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Dao.sql.xml.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Migration\Entity.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Entity.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Migration\Service.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Service.tt</DependentUpon>
+    </Compile>
+    <Compile Update="MRSoftCar\Controller.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Controller.tt</DependentUpon>
+    </Compile>
+    <Compile Update="MRSoftCar\Entity.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Entity.tt</DependentUpon>
+    </Compile>
+    <Compile Update="MRSoftCar\Facade.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Facade.tt</DependentUpon>
+    </Compile>
+    <Compile Update="MRSoftCar\IFacade.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>IFacade.tt</DependentUpon>
+    </Compile>
+    <Compile Update="MRSoftCar\InputDto.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>InputDto.tt</DependentUpon>
+    </Compile>
+    <Compile Update="MRSoftCar\IService.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>IService.tt</DependentUpon>
+    </Compile>
+    <Compile Update="MRSoftCar\Mapping.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Mapping.tt</DependentUpon>
+    </Compile>
+    <Compile Update="MRSoftCar\MappingConfig.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MappingConfig.tt</DependentUpon>
+    </Compile>
+    <Compile Update="MRSoftCar\OutputDto.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>OutputDto.tt</DependentUpon>
+    </Compile>
+    <Compile Update="MRSoftCar\Service.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Service.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Migration\Dao.sql.xml.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Dao.sql.xml.cs</LastGenOutput>
+    </None>
+    <None Update="Migration\Entity.tt">
+      <LastGenOutput>Entity.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="Migration\Service.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Service.cs</LastGenOutput>
+    </None>
+    <None Update="MRSoftCar\Controller.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Controller.cs</LastGenOutput>
+    </None>
+    <None Update="MRSoftCar\Entity.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Entity.cs</LastGenOutput>
+    </None>
+    <None Update="MRSoftCar\Facade.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Facade.cs</LastGenOutput>
+    </None>
+    <None Update="MRSoftCar\IFacade.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IFacade.cs</LastGenOutput>
+    </None>
+    <None Update="MRSoftCar\InputDto.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>InputDto.cs</LastGenOutput>
+    </None>
+    <None Update="MRSoftCar\IService.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IService.cs</LastGenOutput>
+    </None>
+    <None Update="MRSoftCar\Mapping.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Mapping.cs</LastGenOutput>
+    </None>
+    <None Update="MRSoftCar\MappingConfig.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>MappingConfig.cs</LastGenOutput>
+    </None>
+    <None Update="MRSoftCar\OutputDto.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>OutputDto.cs</LastGenOutput>
+    </None>
+    <None Update="MRSoftCar\Service.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Service.cs</LastGenOutput>
+    </None>
+    <None Update="MRSoftCar\Service.txt">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Service.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+</Project>

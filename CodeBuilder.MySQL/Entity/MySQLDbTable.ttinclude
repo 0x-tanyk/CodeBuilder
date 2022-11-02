@@ -1,0 +1,42 @@
+﻿<#+
+    /// <summary>
+    /// 实体
+    /// </summary>
+    public class MySQLDbTable
+    {
+        /// <summary>
+        /// 无参构造方法
+        /// </summary>
+        public MySQLDbTable()
+        {
+            Fields = new List<MySQLDbField>();
+        }
+
+        /// <summary>
+        /// 构造方法
+        /// </summary>
+        /// <param name="name">名称</param>
+        /// <param name="comment">描述</param>
+        public MySQLDbTable(string name, string comment) 
+            : this()
+        {
+            Name = name;
+            Comment = comment;
+        }
+        
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name { get; set; }
+        
+        /// <summary>
+        /// 描述
+        /// </summary>
+        public string Comment { get; set; }
+        
+        /// <summary>
+        /// 属性集合
+        /// </summary>
+        public List<MySQLDbField> Fields { get; set; }
+    }
+#>

@@ -1,0 +1,280 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+
+<#@ import namespace="System" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+
+<#@ include file="$(ProjectDir)\Config\DbConnection.ttinclude" #>
+<#@ include file="$(ProjectDir)\Config\TemplateComment.ttinclude" #>
+<#@ include file="$(ProjectDir)\Entity\MySQLDbField.ttinclude" #>
+<#@ include file="$(ProjectDir)\Entity\MySQLDbTable.ttinclude" #>
+<#@ include file="$(ProjectDir)\Helper\MySQLDbHelper.ttinclude" #>
+<#@ include file="$(ProjectDir)\Helper\MySQLCLRTypeHelper.ttinclude" #>
+<#@ include file="$(ProjectDir)\Helper\StringHelper.ttinclude" #>
+<#@ include file="AMRSoftCar.ttinclude" #>
+
+<#   
+    var entities = MySQLDbHelper.GetEntities(DbConnection.CONNECTION_STRING, AMRSoftCar.DB_NAME);
+    foreach(MySQLDbTable entity in entities)
+    {
+		var name = StringHelper.ToBigHump(entity.Name);
+        var comment = entity.Comment;
+#>
+//-----------------------------------------------------------------------
+// <copyright file="<#=name#>.cs" company="<#=TemplateComment.FILE_COPYRIGHT#>">
+// * Copyright (C) <#=TemplateComment.FILE_COPYRIGHT_YEAR#> <#=TemplateComment.FILE_COPYRIGHT#> All Rights Reserved
+// * Version : <#=TemplateComment.SDK_VERSION#>
+// * Author  : <#=TemplateComment.FILE_AUTHOR#>
+// * FileName: <#=name#>.cs
+// * DateTime: <#=TemplateComment.FILE_TIME#>
+// </copyright>
+//-----------------------------------------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using MRSoft.Data;
+using MRSOFT.Extensions;
+using MRSOFT.Paging;
+using MRSOFT.Snowflake;
+using MRSoftCar.Base.Enums;
+using MRSoftCar.Base.Exceptions;
+using MRSoftCar.Base.Extensions;
+using MRSoftCar.Base.Utils;
+using MRSoftCar.Dto.Common;
+using MRSoftCar.Dto.Member;
+using MRSoftCar.Entity.Member;
+using MRSoftCar.IService;
+
+namespace <#=AMRSoftCar.FILE_NAMESPACE#>.Service.<#=AMRSoftCar.FILE_DOMAINNAME#>
+{
+    /// <summary>
+    /// <#=comment#>
+    /// </summary>
+    public class <#=name#>Service : I<#=name#>Service
+    {
+        /// <summary>
+        /// 新增
+        /// </summary>
+        /// <param name="dto"><#=comment#>输入信息</param>
+        /// <returns><#=comment#>Id</returns>
+        public async Task<long> CreateAsync(<#=name#>InputDto dto)
+        {
+            //校验数据
+            await CheckData(dto, true);
+            var <#=name.ToLower()#> = dto.MapTo<<#=name#>>();
+            <#=name.ToLower()#>.<#=name#>Id = IdWorkerBuilder.NewId();
+            await DapperFactory.Instance.InsertAsync(<#=name.ToLower()#>, DataSourceName.DevLink);
+            return <#=name.ToLower()#>.<#=name#>Id;
+        }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="ids"><#=comment#>Id集合</param>
+        /// <returns>操作结果</returns>
+        public async Task<int> DeleteAsync(IEnumerable<long> ids)
+        {
+            var result = await DapperFactory.Instance.DeleteAsync(
+                "mrsoftcar_<#=name.ToLower()#>_delete",
+                new { IsDelete = 1, ModifyTime = DateTime.Now.ToUnixTime(), Ids = ids },
+                DataSourceName.DevLink);
+            return result;
+        }
+
+        /// <summary>
+        /// 编辑
+        /// </summary>
+        /// <param name="dto"><#=comment#>输入信息</param>
+        /// <returns>操作结果</returns>
+        public async Task<int> ModifyAsync(<#=name#>InputDto dto)
+        {
+            var <#=name.ToLower()#> = await GetSingle<<#=name#>>(dto.<#=name#>Id);
+            if (<#=name.ToLower()#> == null)
+            {
+                throw new WException(ResponseCode.ValidError, "该<#=comment#>不存在！");
+            }
+            //校验数据
+            await CheckData(dto);
+            SetEntity(<#=name.ToLower()#>, dto);
+            <#=name.ToLower()#>.ModifyTime = DateTime.Now.ToUnixTime();
+            var result = await DapperFactory.Instance.UpdateAsync(<#=name.ToLower()#>, DataSourceName.DevLink);
+            return result;
+        }
+
+        /// <summary>
+        /// 禁用
+        /// </summary>
+        /// <param name="ids"><#=comment#>Id集合</param>
+        /// <returns>操作结果</returns>
+        public async Task<int> DisableAsync(IEnumerable<long> ids)
+        {
+            var result = await DapperFactory.Instance.DeleteAsync(
+                "mrsoftcar_<#=name.ToLower()#>_change",
+                new { IsDisable = 1, ModifyTime = DateTime.Now.ToUnixTime(), Ids = ids },
+                DataSourceName.DevLink);
+            return result;
+        }
+
+        /// <summary>
+        /// 启用
+        /// </summary>
+        /// <param name="ids"><#=comment#>Id集合</param>
+        /// <returns>操作结果</returns>
+        public async Task<int> EnableAsync(IEnumerable<long> ids)
+        {
+            var result = await DapperFactory.Instance.DeleteAsync(
+                "mrsoftcar_<#=name.ToLower()#>_change",
+                new { IsDisable = 0, ModifyTime = DateTime.Now.ToUnixTime(), Ids = ids },
+                DataSourceName.DevLink);
+            return result;
+        }
+
+        /// <summary>
+        /// 检查<#=comment#>是否存在
+        /// </summary>
+        /// <param name="name"><#=comment#>名称</param>
+        /// <param name="shopId">店铺Id</param>
+        /// <param name="id">排除<#=comment#>Id</param>
+        /// <returns>是否存在</returns>
+        public async Task<bool> CheckIsExistAsync(string name, long shopId, long? id = null)
+        {
+            var count = await DapperFactory.Instance.QueryFirstAsync<int>(
+                "mrsoftcar_<#=name.ToLower()#>_exists",
+                new { ShopId = shopId, Name = name, Id = id },
+                DataSourceName.DevLink);
+            var exists = count > 0;
+            return exists;
+        }
+
+        /// <summary>
+        /// 是否存在
+        /// </summary>
+        /// <param name="id"><#=comment#>Id</param>
+        /// <returns>是否存在</returns>
+        public async Task<bool> CheckIsExistAsync(long id)
+        {
+            var total = await DapperFactory.Instance.QueryFirstOrDefaultAsync<int>(
+                "mrsoftcar_<#=name.ToLower()#>_existsid",
+                new { <#=name#>Id = id },
+                DataSourceName.DevLink);
+            var flag = total > 0;
+            return flag;
+        }
+
+        /// <summary>
+        /// 检查<#=comment#>Id集合是否存在
+        /// </summary>
+        /// <param name="ids"><#=comment#>Id集合</param>
+        /// <returns>是否存在</returns>
+        public async Task<bool> CheckIsExistAsync(IEnumerable<long> ids)
+        {
+            var total = await DapperFactory.Instance.QueryFirstOrDefaultAsync<int>(
+                "mrsoftcar_<#=name.ToLower()#>_existsid",
+                new { Ids = ids },
+                DataSourceName.DevLink);
+            var flag = total > 0;
+            return flag;
+        }
+
+        /// <summary>
+        /// 获取列表（下拉框）
+        /// </summary>
+        /// <param name="shopId">店铺Id</param>
+        /// <returns>列表数据（下拉框）</returns>
+        public async Task<IEnumerable<SelectItemDto>> GetDropdownListAsync(long shopId)
+        {
+            var result = await DapperFactory.Instance.QueryAsync<SelectItemDto>(
+                "mrsoftcar_<#=name.ToLower()#>_dropdownlist",
+                new { ShopId = shopId },
+                DataSourceName.DevLink);
+            return result;
+        }
+
+        /// <summary>
+        ///获取列表        
+        /// </summary>
+        /// <param name="queryDto">查询参数</param>
+        /// <returns>列表数据</returns>
+        public async Task<PagedDto<<#=name#>OutputDto>> GetListAsync(PageQueryDto queryDto)
+        {
+            var result = await DapperFactory.Instance.QueryPagingAsync<<#=name#>OutputDto>(
+                "mrsoftcar_<#=name.ToLower()#>_search",
+                queryDto,
+                true,
+                DataSourceName.DevLink);
+            return result;
+        }
+
+        /// <summary>
+        /// 获取单个
+        /// </summary>
+        /// <param name="id"><#=comment#>Id</param>
+        /// <returns><#=comment#>信息</returns>
+        public async Task<<#=name#>OutputDto> Get<#=name#>infoAsync(long id)
+        {
+            var cardType = await GetSingle<<#=name#>OutputDto>(id);
+            return cardType ?? new <#=name#>OutputDto();
+        }
+
+        #region 私有方法        
+
+        /// <summary>
+        /// 获取单个
+        /// </summary>
+        /// <typeparam name="T">返回值类型</typeparam>
+        /// <param name="id"><#=comment#>Id</param>
+        /// <returns><#=comment#>信息</returns>
+        private async Task<T> GetSingle<T>(long id)
+        {
+            var record = await DapperFactory.Instance.QueryFirstOrDefaultAsync<T>(
+                "mrsoftcar_<#=name.ToLower()#>_single",
+                new { <#=name#>Id = id },
+                DataSourceName.DevLink);
+            return record;
+        }
+
+        /// <summary>
+        /// 赋值 <#=comment#>
+        /// </summary>
+        /// <param name="entity">实体</param>
+        /// <param name="dto"><#=comment#>输入信息</param>
+        private void SetEntity(<#=name#> entity, <#=name#>InputDto dto)
+        {
+            
+        }
+
+        /// <summary>
+        /// 校验数据的合法性
+        /// </summary>
+        /// <param name="dto"><#=comment#>输入信息</param>
+        /// <param name="isAdd">是否新增</param>
+        private async Task CheckData(<#=name#>InputDto dto, bool isAdd = false)
+        {
+            var existsName = isAdd
+                ? await CheckIsExistAsync(dto.Name, dto.ShopId)
+                : await CheckIsExistAsync(dto.Name, dto.ShopId, dto.<#=name#>Id);
+            if (existsName)
+            {
+                throw new WException(ResponseCode.ValidError, "该<#=comment#>名称已经存在！");
+            }
+        }
+
+        #endregion 私有方法
+    }
+}
+
+<#
+        var path = @$"{Host.ResolveAssemblyReference("$(ProjectDir)")}{AMRSoftCar.OUTPUT_PATH}\Service";
+        if(!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+        string fileName = string.Format(@"{0}\{1}.cs", path, $"{name}Service");
+        File.WriteAllText(fileName , this.GenerationEnvironment.ToString());
+        this.GenerationEnvironment.Clear();
+    }
+ #>

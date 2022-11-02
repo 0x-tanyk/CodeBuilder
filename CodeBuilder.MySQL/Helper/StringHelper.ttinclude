@@ -1,0 +1,36 @@
+﻿<#+
+	/// <summary>
+    /// 字符串帮助类
+    /// </summary>
+    public static class StringHelper
+    {
+        /// <summary>
+        /// 转大驼峰
+        /// </summary>
+        /// <param name="source">源字符串</param>
+        /// <param name="splitChar">分隔符，默认为_</param>
+        /// <returns>处理后的字符串</returns>
+        public static string ToBigHump(string source, char splitChar = '_')
+        {
+            if (String.IsNullOrWhiteSpace(source))
+            {
+                return "";
+            }
+
+            string result = string.Intern(string.Empty);
+            var list = source.Split(splitChar).ToList();
+
+            foreach (var item in list)
+            {
+                var temp = splitChar + item;
+                Match mt = Regex.Match(temp, @"_(\w*)*");
+                if (mt.Success)
+                {
+                    string newUpper = temp.Substring(temp.IndexOf(splitChar), 2);
+                    result += temp.Replace(newUpper, newUpper.Trim(splitChar).ToUpper());
+                }
+            }
+            return result;
+        }
+    }
+#>

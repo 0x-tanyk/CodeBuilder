@@ -1,0 +1,32 @@
+﻿<#+
+	/// <summary>
+    /// 模板描述信息
+    /// </summary>
+    public static class TemplateComment
+    {       
+        /// <summary>
+        /// 版权信息
+        /// </summary>
+        public static string FILE_COPYRIGHT = "tanyk Enterprises";
+
+        /// <summary>
+        /// 版权信息—年
+        /// </summary>
+        public static string FILE_COPYRIGHT_YEAR = $"{DateTime.Now:yyyy}";
+
+        /// <summary>
+        /// SDK 版本
+        /// </summary>
+        public static string SDK_VERSION = $"{Environment.Version}";
+
+        /// <summary>
+        /// 作者
+        /// </summary>
+        public static string FILE_AUTHOR = "tanyk";
+
+        /// <summary>
+        /// 时间
+        /// </summary>
+        public static string FILE_TIME = $"{DateTime.Now:yyyy-MM-dd HH:mm}";
+    }
+#>
